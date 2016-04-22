@@ -54,9 +54,9 @@ func handleIndex(c *gin.Context) {
 func handleUpdate(c *gin.Context) {
 	os := c.Param("os")
 	quality := c.Param("quality")
-	commitId := c.Param("commitId")
+	commitID := c.Param("commitId")
 
-	if os == "darwin" && quality == "stable" && commitId != latestRelease {
+	if os == "darwin" && quality == "stable" && commitID != latestRelease {
 		c.JSON(200, gin.H{
 			"url":     "https://ibm.biz/bluemixcode",
 			"version": latestRelease,
