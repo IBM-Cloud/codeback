@@ -58,8 +58,9 @@ func handleUpdate(c *gin.Context) {
 
 	if os == "darwin" && quality == "stable" && commitID != latestRelease {
 		c.JSON(200, gin.H{
-			"url":     "https://ibm.biz/bluemixcode",
-			"version": latestRelease,
+			"url":          "https://ibm.biz/bluemixcode",
+			"version":      latestRelease,
+			"releaseNotes": "https://ibm.biz/bluemixcode-releasenotes",
 		})
 	} else {
 		c.JSON(200, gin.H{"message": "Up to date"})
