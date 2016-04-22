@@ -9,14 +9,11 @@ import (
 	"os"
 )
 
-type Feedback struct {
-	Title string `json:"title"`
-	Body  string `json:"body"`
-}
-
 var (
 	gclient       *github.Client
 	latestRelease string
+	org string = "IBM-Bluemix"
+	repo string = "bluemix-code"
 )
 
 func init() {
@@ -34,14 +31,8 @@ func init() {
 	latestRelease = os.Getenv("LATEST_RELEASE")
 }
 
-func sendIssue(title string, body string) error {
-	labels := []string{"feedback", "from_ide"}
-	i := &github.IssueRequest{
-		Title:  &title,
-		Body:   &body,
-		Labels: &labels,
-	}
-	_, _, err := gclient.Issues.Create("IBM-Bluemix", "bluemix-code", i)
+func sendIssue(issue *github.IssueRequest) error {
+	_, _, err := gclient.Issues.Create(org, repo, issue)
 	return err
 }
 
@@ -65,10 +56,13 @@ func handleUpdate(c *gin.Context) {
 	}
 }
 
-func httpSendFeedback(c *gin.Context) {
-	var feedback Feedback
-	if c.BindJSON(&feedback) == nil {
-		err := sendIssue(feedback.Title, feedback.Body)
+func handleFeedback(c *gin.Context) {
+	labels := []string{"feedback", "from_ide"}
+	issue := &github.IssueRequest{
+		Labels: &labels,
+	}
+	if c.BindJSON(&issue) == nil {
+		err := sendIssue(issue)
 		if err != nil {
 			fmt.Println(err)
 			c.String(400, "Unable to create feedback")
@@ -95,7 +89,7 @@ func main() {
 	})
 
 	router.GET("/", handleIndex)
-	router.POST("/api/feedback", httpSendFeedback)
+	router.POST("/api/feedback", handleFeedback)
 	router.GET("/api/update/:os/:quality/:commit_id", handleUpdate)
 
 	router.Run(":" + port)
