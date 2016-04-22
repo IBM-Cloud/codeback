@@ -37,9 +37,11 @@ func init() {
 }
 
 func sendIssue(title string, body string) error {
+	labels := []string{"feedback", "from_ide"}
 	i := &github.IssueRequest{
-		Title: &title,
-		Body:  &body,
+		Title:  &title,
+		Body:   &body,
+		Labels: &labels,
 	}
 	_, _, err := GClient.Issues.Create("IBM-Bluemix", "bluemix-code", i)
 	return err
