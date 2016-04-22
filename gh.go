@@ -6,7 +6,6 @@ import (
 	"github.com/google/go-github/github"
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
-	"net/http"
 	"os"
 )
 
@@ -16,8 +15,7 @@ type Feedback struct {
 }
 
 var (
-	GClient       *github.Client
-	tc            *http.Client
+	gclient       *github.Client
 	latestRelease string
 )
 
@@ -30,8 +28,8 @@ func init() {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 	)
-	tc = oauth2.NewClient(oauth2.NoContext, ts)
-	GClient = github.NewClient(tc)
+	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	gclient = github.NewClient(tc)
 
 	latestRelease = os.Getenv("LATEST_RELEASE")
 }
@@ -43,7 +41,7 @@ func sendIssue(title string, body string) error {
 		Body:   &body,
 		Labels: &labels,
 	}
-	_, _, err := GClient.Issues.Create("IBM-Bluemix", "bluemix-code", i)
+	_, _, err := gclient.Issues.Create("IBM-Bluemix", "bluemix-code", i)
 	return err
 }
 
@@ -101,5 +99,4 @@ func main() {
 	router.GET("/api/update/:os/:quality/:commit_id", handleUpdate)
 
 	router.Run(":" + port)
-	fmt.Println("Server started on", port)
 }
