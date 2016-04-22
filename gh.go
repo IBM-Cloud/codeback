@@ -54,9 +54,9 @@ func handleIndex(c *gin.Context) {
 func handleUpdate(c *gin.Context) {
 	os := c.Param("os")
 	quality := c.Param("quality")
-	commitID := c.Param("commitID")
+	commitId := c.Param("commitId")
 
-	if os == "darwin" && quality == "stable" && commitID != latestRelease {
+	if os == "darwin" && quality == "stable" && commitId != latestRelease {
 		c.JSON(200, gin.H{
 			"url":     "https://ibm.biz/bluemixcode",
 			"version": latestRelease,
@@ -97,7 +97,7 @@ func main() {
 
 	router.GET("/", handleIndex)
 	router.POST("/api/feedback", httpSendFeedback)
-	router.GET("/api/update/:os/:quality/:commitID", handleUpdate)
+	router.GET("/api/update/:os/:quality/:commitId", handleUpdate)
 
 	router.Run(":" + port)
 	fmt.Println("Server started on", port)
