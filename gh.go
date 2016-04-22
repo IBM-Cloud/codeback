@@ -88,6 +88,11 @@ func main() {
 
 	router := gin.Default()
 
+	//fix for gin not serving HEAD
+	router.HEAD("/", func(c *gin.Context) {
+		c.String(200, "pong")
+	})
+
 	router.GET("/", handleIndex)
 	router.POST("/api/feedback", httpSendFeedback)
 	router.GET("/api/update/:os/:quality/:commitID", handleUpdate)
