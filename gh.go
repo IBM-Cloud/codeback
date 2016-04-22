@@ -6,7 +6,6 @@ import (
 	"github.com/google/go-github/github"
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
-	"net/http"
 	"os"
 )
 
@@ -16,8 +15,7 @@ type Feedback struct {
 }
 
 var (
-	GClient       *github.Client
-	tc            *http.Client
+	gclient       *github.Client
 	latestRelease string
 )
 
@@ -30,8 +28,8 @@ func init() {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 	)
-	tc = oauth2.NewClient(oauth2.NoContext, ts)
-	GClient = github.NewClient(tc)
+	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	gclient = github.NewClient(tc)
 
 	latestRelease = os.Getenv("LATEST_RELEASE")
 }
@@ -43,7 +41,7 @@ func sendIssue(title string, body string) error {
 		Body:   &body,
 		Labels: &labels,
 	}
-	_, _, err := GClient.Issues.Create("IBM-Bluemix", "bluemix-code", i)
+	_, _, err := gclient.Issues.Create("IBM-Bluemix", "bluemix-code", i)
 	return err
 }
 
@@ -54,7 +52,7 @@ func handleIndex(c *gin.Context) {
 func handleUpdate(c *gin.Context) {
 	os := c.Param("os")
 	quality := c.Param("quality")
-	commitID := c.Param("commitID")
+	commitID := c.Param("commit_id")
 
 	if os == "darwin" && quality == "stable" && commitID != latestRelease {
 		c.JSON(200, gin.H{
@@ -92,8 +90,7 @@ func main() {
 
 	router.GET("/", handleIndex)
 	router.POST("/api/feedback", httpSendFeedback)
-	router.GET("/api/update/:os/:quality/:commitID", handleUpdate)
+	router.GET("/api/update/:os/:quality/:commit_id", handleUpdate)
 
 	router.Run(":" + port)
-	fmt.Println("Server started on", port)
 }
