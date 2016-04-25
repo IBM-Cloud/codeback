@@ -7,13 +7,14 @@ import (
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
 	"os"
+	"strings"
 )
 
 var (
 	gclient       *github.Client
 	latestRelease string
-	org string = "IBM-Bluemix"
-	repo string = "bluemix-code"
+	org           string = "IBM-Bluemix"
+	repo          string = "bluemix-code"
 )
 
 func init() {
@@ -45,7 +46,7 @@ func handleUpdate(c *gin.Context) {
 	quality := c.Param("quality")
 	commitID := c.Param("commit_id")
 
-	if os == "darwin" && quality == "stable" && commitID != latestRelease {
+	if strings.EqualFold(os, "darwin") && strings.EqualFold(quality, "stable") && strings.EqualFold(commitID, latestRelease) {
 		c.JSON(200, gin.H{
 			"url":          "https://ibm.biz/bluemixcode",
 			"version":      latestRelease,
