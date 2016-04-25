@@ -7,7 +7,6 @@ import (
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
 	"os"
-	"strings"
 )
 
 var (
@@ -42,11 +41,11 @@ func handleIndex(c *gin.Context) {
 }
 
 func handleUpdate(c *gin.Context) {
-	os := c.Param("os")
+	operatingSystem := c.Param("operating_system")
 	quality := c.Param("quality")
 	commitID := c.Param("commit_id")
 
-	if strings.EqualFold(os, "darwin") && strings.EqualFold(quality, "stable") && strings.EqualFold(commitID, latestRelease) {
+	if operatingSystem == "darwin" && quality == "stable" && commitID != latestRelease {
 		c.JSON(200, gin.H{
 			"url":          "https://ibm.biz/bluemixcode",
 			"version":      latestRelease,
@@ -91,7 +90,7 @@ func main() {
 
 	router.GET("/", handleIndex)
 	router.POST("/api/feedback", handleFeedback)
-	router.GET("/api/update/:os/:quality/:commit_id", handleUpdate)
+	router.GET("/api/update/:operating_system/:quality/:commit_id", handleUpdate)
 
 	router.Run(":" + port)
 }
