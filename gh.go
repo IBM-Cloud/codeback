@@ -45,9 +45,17 @@ func handleUpdate(c *gin.Context) {
 	quality := c.Param("quality")
 	commitID := c.Param("commit_id")
 
-	if operatingSystem == "darwin" && quality == "stable" && commitID != latestRelease {
+	var updateURL = "https://ibm.biz/bluemix-os-notsupported"
+
+	if operatingSystem == "darwin" {
+		updateURL = "https://ibm.biz/bluemixcode"
+	} else if operatingSystem == "win32" {
+		updateURL = "https://ibm.biz/bluemixcode-win32"
+	}
+
+	if quality == "stable" && commitID != latestRelease {
 		c.JSON(200, gin.H{
-			"url":          "https://ibm.biz/bluemixcode",
+			"url":          updateURL,
 			"version":      latestRelease,
 			"releaseNotes": "https://ibm.biz/bluemixcode-releasenotes",
 		})
