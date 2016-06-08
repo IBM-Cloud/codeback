@@ -95,6 +95,12 @@ func main() {
 	router.HEAD("/", func(c *gin.Context) {
 		c.String(200, "pong")
 	})
+	
+	router.Use(func (context *gin.Context) {
+		// add header Access-Control-Allow-Origin
+  		context.Writer.Header().Add("Access-Control-Allow-Origin", "*")
+  		context.Next()
+	})
 
 	router.GET("/", handleIndex)
 	router.POST("/api/feedback", handleFeedback)
