@@ -2,18 +2,18 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/github"
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
-	"os"
 )
 
 var (
-	gclient       *github.Client
-	latestRelease string
-	org           string = "IBM-Bluemix"
-	repo          string = "bluemix-code"
+	gclient *github.Client
+	org     string = "IBM-Bluemix"
+	repo    string = "bluemix-code"
 )
 
 func init() {
@@ -27,8 +27,6 @@ func init() {
 	)
 	tc := oauth2.NewClient(oauth2.NoContext, ts)
 	gclient = github.NewClient(tc)
-
-	latestRelease = os.Getenv("LATEST_RELEASE")
 }
 
 func sendIssue(issue *github.IssueRequest) error {
@@ -38,30 +36,6 @@ func sendIssue(issue *github.IssueRequest) error {
 
 func handleIndex(c *gin.Context) {
 	c.String(200, "Nothing to see here")
-}
-
-func handleUpdate(c *gin.Context) {
-	operatingSystem := c.Param("operating_system")
-	quality := c.Param("quality")
-	commitID := c.Param("commit_id")
-
-	var updateURL = "https://ibm.biz/bluemix-os-notsupported"
-
-	if operatingSystem == "darwin" {
-		updateURL = "https://ibm.biz/bluemixcode"
-	} else if operatingSystem == "win32" {
-		updateURL = "https://ibm.biz/bluemixcode-win32"
-	}
-
-	if quality == "stable" && commitID != latestRelease {
-		c.JSON(200, gin.H{
-			"url":          updateURL,
-			"version":      latestRelease,
-			"releaseNotes": "https://ibm.biz/bluemixcode-releasenotes",
-		})
-	} else {
-		c.JSON(200, gin.H{"message": "Up to date"})
-	}
 }
 
 func handleFeedback(c *gin.Context) {
@@ -98,7 +72,6 @@ func main() {
 
 	router.GET("/", handleIndex)
 	router.POST("/api/feedback", handleFeedback)
-	router.GET("/api/update/:operating_system/:quality/:commit_id", handleUpdate)
 
 	router.Run(":" + port)
 }
